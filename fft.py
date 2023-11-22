@@ -1,4 +1,6 @@
 import argparse # for parsing command line arguments
+import numpy as np
+import matplotlib.pyplot as plt
 
 class Fft:
     parser = argparse.ArgumentParser()
@@ -7,9 +9,29 @@ class Fft:
 
     args = parser.parse_args()
 
+    def fast_mode(self):
+        print("fast mode")
+
+    def denoising(self):
+        print("denoising")
+
+    def compressing(self):
+        print("compressing")
+
+    def plotting(self):
+        print("plotting")
 
 if __name__ == "__main__":
     # program starts running here
     fft = Fft()
-    print("mode: " + str(fft.args.m))
-    print("image: " + fft.args.i)
+
+    if(fft.args.m == 1):
+        fft.fast_mode()
+    elif(fft.args.m == 2):
+        fft.denoising()
+    elif(fft.args.m == 3):
+        fft.compressing()
+    elif(fft.args.m == 4):
+        fft.plotting()
+
+
