@@ -46,9 +46,64 @@ class Fft:
             h = int(2 ** np.ceil(np.log2(h)))
             img = cv.resize(img, (w,h))
 
+        #temp = [[1, 2], [3, 4]]
+        temp = [[5, 4, 6, 3, 7], [-1, -3, -4, -7, 0]]
+        self.naive_dft_2d(temp)
+
         # cv.imshow("Display window", img)
         # K = cv.waitKey(0) # Wait for a keystroke in the window
 
+    def naive_dft_1d(self, img_array):
+        # assign complex values to array
+        N = len(img_array)
+        X = np.zeros(N, dtype=complex)
+        for k in range(N): # RENAME VAR TO MATCH FORMULA
+            for n in range(N):
+                X[k] += img_array[n] * np.exp((-2j * np.pi * k * n) / N)
+
+        return X
+    
+    def naive_dft_1d_inverse(self, img_array):
+        complex_img_array = np.asarray(img_array, dtype=complex)
+        N = complex_img_array.shape[0]
+        x = np.zeros(N, dtype=complex)
+        for k in range(N):
+            for n in range(N):
+                x[k] += complex_img_array[n] * (1/N) * (np.exp((2j * np.pi * k * n) / N))
+
+        return x
+    
+    def naive_dft_2d(self, img_array):
+        complex_img_array = np.asarray(img_array, dtype=complex)
+        h, w = complex_img_array.shape[:2]
+
+        F = np.zeros((h, w), dtype=complex)
+
+        for row in range(h):
+            F[row, :] = self.naive_dft_1d(complex_img_array[row, :])
+
+        for column in range(w):
+            F[:, column] = self.naive_dft_1d(F[:,column])
+
+       # print(str(F))
+        # print("fft2")
+        # gfg = np.fft.fft2(img_array) 
+        # print(gfg)
+        return F
+    
+    def naive_dft_2d_inverse(self, img_array):
+        complex_img_array = np.asarray(img_array, dtype=complex)
+        h, w = complex_img_array.shape[:2]
+
+        f = np.zeros((h, w), dtype=complex)
+
+        for row in range(h):
+            f[row, :] = self.naive_dft_1d_inverse(complex_img_array[row, :])
+
+        for column in range(w):
+            f[:, column] = self.naive_dft_1d_inverse(f[:,column])
+
+        return f
 
 if __name__ == "__main__":
     # program starts running here
