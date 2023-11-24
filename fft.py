@@ -57,13 +57,21 @@ class Fft:
             h = int(2 ** np.ceil(np.log2(h)))
             self.img = cv.resize(self.img, (w,h))
 
-        #temp = [[1, 2], [3, 4]]
-        temp = [[5, 4, 6, 3, 7], [-1, -3, -4, -7, 0]]
-        self.naive_dft_2d(temp)
+        temp = [1, 2, 3, 4, 5, 6, 7, 8]
+        X = self.fft_dft_1d_inverse(temp)
+        print(str(X))
+        print("fft")
+        gfg = np.fft.ifft(temp) 
+        #gfg = np.fft.fft(temp) 
+        print(gfg)
+
+        # temp = [[5, 4, 6, 3, 7, 8, 10, 24], [-1, -3, -4, -7, 0, -1, 2, 4]]
+        # self.fft_dft_2d(temp)
 
         # cv.imshow("Display window", img)
         # K = cv.waitKey(0) # Wait for a keystroke in the window
 
+    # Naive
     def naive_dft_1d(self, img_1D_array):
         # assign complex values to array
         N = len(img_1D_array)
@@ -74,7 +82,7 @@ class Fft:
 
         return X
     
-    def naive_dft_1d_inverse(self, img_1D_array):
+    def naive_dft_1d_inverse(self, img_1D_array): #might just need FFT and not naive for inverse
         N = len(img_1D_array)
         x = np.zeros(N, dtype=complex)
         for k in range(N):
@@ -101,7 +109,7 @@ class Fft:
         # print(gfg)
         return F
     
-    def naive_dft_2d_inverse(self, img_2D_array):
+    def naive_dft_2d_inverse(self, img_2D_array): #might just need FFT and not naive for inverse
         complex_img_array = np.asarray(img_2D_array, dtype=complex)
         h, w = complex_img_array.shape[:2]
 
@@ -114,6 +122,67 @@ class Fft:
             f[:, column] = self.naive_dft_1d_inverse(f[:,column])
 
         return f
+    
+    # FFT
+    
+    def fft_dft_1d(self, img_1D_array):
+        # we can assume that the size of img_1D_array is a power of 2 as when 
+        # converting the original image into a NumPy array, we resize it so that it is.
+        N = len(img_1D_array)
+        # TODO to CHOOSE
+        if N <= 2: # stop splitting the problem and use naive method instead
+            # We chose to stop splitting the problems at 64
+            # We just want the runtime of your FFT to be in the same order of magnitude as what is theoretically expected 
+            return self.naive_dft_1d(img_1D_array)
+        else:
+            # Split the sum in the even and odd indices which we sum separately and then put together
+            X = np.zeros(N, dtype=complex)
+            # list[start:end:step].
+            even = self.fft_dft_1d(img_1D_array[0::2])
+            odd = self.fft_dft_1d(img_1D_array[1::2])
+
+            for k in range (N //2):
+                X[k] = even[k] + np.exp((-2j * np.pi * k) / N) * odd[k]
+                X[k + (N // 2)] = even[k] + np.exp((-2j * np.pi * (k + (N // 2))) / N) * odd[k]
+            return X
+        
+    def fft_dft_1d_inverse(self, img_1D_array):
+        # we can assume that the size of img_1D_array is a power of 2 as when 
+        # converting the original image into a NumPy array, we resize it so that it is.
+        N = len(img_1D_array)
+        # TODO to CHOOSE
+        if N <= 2:
+            return self.naive_dft_1d_inverse(img_1D_array)
+        else:
+            # Split the sum in the even and odd indices which we sum separately and then put together
+            x = np.zeros(N, dtype=complex)
+            # list[start:end:step].
+            even = self.fft_dft_1d_inverse(img_1D_array[0::2])
+            odd = self.fft_dft_1d_inverse(img_1D_array[1::2])
+
+            for k in range (N //2):
+                x[k] = (1/N) * (even[k] + np.exp((2j * np.pi * k) / N) * odd[k])
+                x[k + (N // 2)] = (1/N) * (even[k] + np.exp((2j * np.pi * (k + (N // 2))) / N) * odd[k])
+            return x
+        
+    def fft_dft_2d(self, img_2D_array):
+        complex_img_array = np.asarray(img_2D_array, dtype=complex)
+        h, w = complex_img_array.shape[:2]
+
+        F = np.zeros((h, w), dtype=complex)
+
+        for row in range(h):
+            F[row, :] = self.fft_dft_1d(complex_img_array[row, :])
+
+        for column in range(w):
+            F[:, column] = self.fft_dft_1d(F[:,column])
+
+        # print(str(F))
+        # print("fft2")
+        # gfg = np.fft.fft2(img_2D_array) 
+        # print(gfg)
+        return F   
+
 
 if __name__ == "__main__":
     # program starts running here
