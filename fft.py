@@ -36,6 +36,40 @@ class Fft:
         # Your program should print in the command line the number of non-zeros you are using and 
         # the fraction they represent of the original Fourier coefficients.
 
+        keep_fraction = 0.2
+        transformed_img = self.fft_dft_2d(self.img)
+        # transformed_img = self.naive_dft_2d(self.img)
+        h, w = transformed_img.shape[:2]
+
+        # https://scipy-lectures.org/intro/scipy/auto_examples/solutions/plot_fft_image_denoise.html
+
+        # transformed_img[int(h * keep_fraction) : int(h*(1-keep_fraction))] = 0
+        # transformed_img[:, int(w*keep_fraction) : int(w * (1-keep_fraction))] = 0
+
+        for row in range(int(h * keep_fraction), int(h * (1 - keep_fraction))):
+            transformed_img[row, :] = 0
+
+        for column in range(int(w * keep_fraction), int(w * (1 - keep_fraction))):
+            transformed_img[:, column] = 0
+
+        print("transformed" + str(transformed_img))
+        number_of_non_zeros = np.count_nonzero(transformed_img)
+
+        # Invert the denoised image
+        # transformed_img = self.fft_dft_2d_inverse(transformed_img).real
+        transformed_img = self.naive_dft_2d_inverse(transformed_img).real
+
+        # Plot the original image and the denoised image
+        _, axs = plt.subplots(1, 2)
+        axs[0].imshow(self.img, cmap='gray')
+        axs[0].set_title('Original Image')
+        axs[1].imshow(transformed_img.real, cmap='gray')
+        axs[1].set_title('Denoised Image')
+        plt.show()
+
+        print("Number of non-zeros: " + str(number_of_non_zeros))
+        print("Fraction of non-zeros: " + str(number_of_non_zeros / (h * w)))
+
     # Mode 3
     def mode_3(self):
         print("mode 3")
@@ -46,6 +80,30 @@ class Fft:
 
     def convert_image_into_array(self):
         self.img = cv.imread(self.args.i, cv.IMREAD_GRAYSCALE)
+        # self.img = np.array([
+        #     [10, 20, 30],
+        #     [40, 50, -60],
+        #     [70, 80, 90]
+        # ])
+
+        # self.img = np.array([
+        #     [5, 4, 6, 3, 7, 8, 10, 24],
+        #     [-1, -3, -4, -7, 0, -1, 2, 4]
+        # ])
+
+        # self.img = np.array([
+        #     [1, 2, 3, 4, 5, 6, 7, 8],
+        #     [6, 7, 8, 9, 10, 11, 12, 13],
+        #     [11, 12, 13, 14, 15, 16, 17, 18],
+        #     [11, 12, 13, 14, 15, 16, 17, 18]
+        # ])
+
+        # self.img = np.array([
+        #     [1, 2, 3, 4, 5, 6, 7],
+        #     [6, 7, 8, 9, 10, 11, 12],
+        #     [11, 12, 13, 14, 15, 16, 17],
+        #     [11, 12, 13, 14, 15, 16, 17]
+        # ])
 
         # If the image given doesn't have a length or width that is a power of 2 
         # resize it with cv2 otherwise the FFT algorithm might not work
@@ -57,13 +115,8 @@ class Fft:
             h = int(2 ** np.ceil(np.log2(h)))
             self.img = cv.resize(self.img, (w,h))
 
-        temp = [1, 2, 3, 4, 5, 6, 7, 8]
-        X = self.fft_dft_1d_inverse(temp)
-        print(str(X))
-        print("fft")
-        gfg = np.fft.ifft(temp) 
         #gfg = np.fft.fft(temp) 
-        print(gfg)
+        # print(gfg)
 
         # temp = [[5, 4, 6, 3, 7, 8, 10, 24], [-1, -3, -4, -7, 0, -1, 2, 4]]
         # self.fft_dft_2d(temp)
