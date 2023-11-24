@@ -16,10 +16,17 @@ class Fft:
     # Mode 1
     def mode_1(self):
         print("mode 1")
-        # simply perform the FFT and output a one by two subplot of the original image and next to it its Fourier transform. 
-
-        # The Fourier transform should be log scaled. 
-        # An easy way to do this with matplotlib is to import LogNorm from matplotlib.colors to produce a logarithmic colormap.
+        # simply perform the FFT and  
+        transformed_img = self.fft_dft_2d(self.img)
+        # Output a one by two subplot of the original image and next to it its Fourier transform.
+        _, axs = plt.subplots(1, 2)
+        axs[0].imshow(self.img, cmap='gray')
+        axs[0].set_title('Original Image')
+        # np.abs(transformed_img) calculates the magnitude of the Fourier transform
+        # norm=LogNorm() as the Fourier transform should be log scaled
+        axs[1].imshow(np.abs(transformed_img), norm=LogNorm())
+        axs[1].set_title('Fourier transform')
+        plt.show()
 
     # Mode 2
     def mode_2(self):
@@ -115,6 +122,8 @@ class Fft:
             h = int(2 ** np.ceil(np.log2(h)))
             self.img = cv.resize(self.img, (w,h))
 
+        # For testing purposes:
+
         # temp = [1, 2, 3, 4, 5, 6, 7, 8]
         # X = self.fft_dft_1d_inverse(temp)
         # print(str(X))
@@ -123,8 +132,8 @@ class Fft:
         # #gfg = np.fft.fft(temp) 
         # print(gfg)
 
-        temp = [[5, 4, 6, 3, 7, 8, 10, 24], [-1, -3, -4, -7, 0, -1, 2, 4]]
-        self.fft_dft_2d_inverse(temp)
+        # temp = [[5, 4, 6, 3, 7, 8, 10, 24], [-1, -3, -4, -7, 0, -1, 2, 4]]
+        # self.fft_dft_2d_inverse(temp)
 
         # cv.imshow("Display window", img)
         # K = cv.waitKey(0) # Wait for a keystroke in the window
