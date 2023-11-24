@@ -34,17 +34,17 @@ class Fft:
         print("mode 4")
 
     def convert_image_into_array(self):
-        img = cv.imread(self.args.i, cv.IMREAD_GRAYSCALE)
+        self.img = cv.imread(self.args.i, cv.IMREAD_GRAYSCALE)
 
         # If the image given doesn't have a length or width that is a power of 2 
         # resize it with cv2 otherwise the FFT algorithm might not work
         
         # get current width and height
-        h, w = img.shape[:2]
+        h, w = self.img.shape[:2]
         if (w & (w-1)) != 0  | (h & (h-1)) !=0 : 
             w = int(2 ** np.ceil(np.log2(w)))
             h = int(2 ** np.ceil(np.log2(h)))
-            img = cv.resize(img, (w,h))
+            self.img = cv.resize(self.img, (w,h))
 
         #temp = [[1, 2], [3, 4]]
         temp = [[5, 4, 6, 3, 7], [-1, -3, -4, -7, 0]]
