@@ -57,16 +57,16 @@ class Fft:
             h = int(2 ** np.ceil(np.log2(h)))
             self.img = cv.resize(self.img, (w,h))
 
-        temp = [1, 2, 3, 4, 5, 6, 7, 8]
-        X = self.fft_dft_1d_inverse(temp)
-        print(str(X))
-        print("fft")
-        gfg = np.fft.ifft(temp) 
-        #gfg = np.fft.fft(temp) 
-        print(gfg)
+        # temp = [1, 2, 3, 4, 5, 6, 7, 8]
+        # X = self.fft_dft_1d_inverse(temp)
+        # print(str(X))
+        # print("fft")
+        # gfg = np.fft.ifft(temp) 
+        # #gfg = np.fft.fft(temp) 
+        # print(gfg)
 
-        # temp = [[5, 4, 6, 3, 7, 8, 10, 24], [-1, -3, -4, -7, 0, -1, 2, 4]]
-        # self.fft_dft_2d(temp)
+        temp = [[5, 4, 6, 3, 7, 8, 10, 24], [-1, -3, -4, -7, 0, -1, 2, 4]]
+        self.fft_dft_2d_inverse(temp)
 
         # cv.imshow("Display window", img)
         # K = cv.waitKey(0) # Wait for a keystroke in the window
@@ -82,7 +82,7 @@ class Fft:
 
         return X
     
-    def naive_dft_1d_inverse(self, img_1D_array): #might just need FFT and not naive for inverse
+    def naive_dft_1d_inverse(self, img_1D_array):
         N = len(img_1D_array)
         x = np.zeros(N, dtype=complex)
         for k in range(N):
@@ -109,7 +109,7 @@ class Fft:
         # print(gfg)
         return F
     
-    def naive_dft_2d_inverse(self, img_2D_array): #might just need FFT and not naive for inverse
+    def naive_dft_2d_inverse(self, img_2D_array):
         complex_img_array = np.asarray(img_2D_array, dtype=complex)
         h, w = complex_img_array.shape[:2]
 
@@ -161,10 +161,29 @@ class Fft:
             odd = self.fft_dft_1d_inverse(img_1D_array[1::2])
 
             for k in range (N //2):
-                x[k] = (1/N) * (even[k] + np.exp((2j * np.pi * k) / N) * odd[k])
-                x[k + (N // 2)] = (1/N) * (even[k] + np.exp((2j * np.pi * (k + (N // 2))) / N) * odd[k])
+                x[k] = (1/2)* (even[k] + np.exp((2j * np.pi * k) / N) * odd[k])
+                x[k + (N // 2)] = (1/2)* (even[k] + np.exp((2j * np.pi * (k + (N // 2))) / N) * odd[k])
+
             return x
         
+    def fft_dft_2d_inverse(self, img_2D_array):
+        complex_img_array = np.asarray(img_2D_array, dtype=complex)
+        h, w = complex_img_array.shape[:2]
+
+        F = np.zeros((h, w), dtype=complex)
+
+        for row in range(h):
+            F[row, :] = self.fft_dft_1d_inverse(complex_img_array[row, :])
+
+        for column in range(w):
+            F[:, column] = self.fft_dft_1d_inverse(F[:,column])
+
+        # print(str(F))
+        # print("fft2")
+        # gfg = np.fft.ifft2(img_2D_array) 
+        # print(gfg)
+        return F   
+    
     def fft_dft_2d(self, img_2D_array):
         complex_img_array = np.asarray(img_2D_array, dtype=complex)
         h, w = complex_img_array.shape[:2]
@@ -181,7 +200,7 @@ class Fft:
         # print("fft2")
         # gfg = np.fft.fft2(img_2D_array) 
         # print(gfg)
-        return F   
+        return F 
 
 
 if __name__ == "__main__":
