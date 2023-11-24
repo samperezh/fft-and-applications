@@ -24,6 +24,17 @@ class Fft:
     # Mode 2
     def mode_2(self):
         print("mode 2")
+        # output a one by two subplot:
+        # include the original image next to its denoised version. 
+
+        # To denoise: take the FFT of the image and set all the high frequencies to zero 
+        # before inverting to get back the filtered original. 
+        # Where you choose to draw the distinction between a “high” and a “low” frequency is up to you to design and tune for to get the best result.
+
+        # Note: The FFT plot you produce goes from 0 to 2π so any frequency close to zero can be considered low 
+        # (even frequencies near 2π) since 2π is just zero shifted by a cycle. 
+        # Your program should print in the command line the number of non-zeros you are using and 
+        # the fraction they represent of the original Fourier coefficients.
 
     # Mode 3
     def mode_3(self):
@@ -53,28 +64,27 @@ class Fft:
         # cv.imshow("Display window", img)
         # K = cv.waitKey(0) # Wait for a keystroke in the window
 
-    def naive_dft_1d(self, img_array):
+    def naive_dft_1d(self, img_1D_array):
         # assign complex values to array
-        N = len(img_array)
+        N = len(img_1D_array)
         X = np.zeros(N, dtype=complex)
         for k in range(N): # RENAME VAR TO MATCH FORMULA
             for n in range(N):
-                X[k] += img_array[n] * np.exp((-2j * np.pi * k * n) / N)
+                X[k] += img_1D_array[n] * np.exp((-2j * np.pi * k * n) / N)
 
         return X
     
-    def naive_dft_1d_inverse(self, img_array):
-        complex_img_array = np.asarray(img_array, dtype=complex)
-        N = complex_img_array.shape[0]
+    def naive_dft_1d_inverse(self, img_1D_array):
+        N = len(img_1D_array)
         x = np.zeros(N, dtype=complex)
         for k in range(N):
             for n in range(N):
-                x[k] += complex_img_array[n] * (1/N) * (np.exp((2j * np.pi * k * n) / N))
+                x[k] += img_1D_array[n] * (1/N) * (np.exp((2j * np.pi * k * n) / N))
 
         return x
     
-    def naive_dft_2d(self, img_array):
-        complex_img_array = np.asarray(img_array, dtype=complex)
+    def naive_dft_2d(self, img_2D_array):
+        complex_img_array = np.asarray(img_2D_array, dtype=complex)
         h, w = complex_img_array.shape[:2]
 
         F = np.zeros((h, w), dtype=complex)
@@ -85,14 +95,14 @@ class Fft:
         for column in range(w):
             F[:, column] = self.naive_dft_1d(F[:,column])
 
-       # print(str(F))
+        # print(str(F))
         # print("fft2")
-        # gfg = np.fft.fft2(img_array) 
+        # gfg = np.fft.fft2(img_2D_array) 
         # print(gfg)
         return F
     
-    def naive_dft_2d_inverse(self, img_array):
-        complex_img_array = np.asarray(img_array, dtype=complex)
+    def naive_dft_2d_inverse(self, img_2D_array):
+        complex_img_array = np.asarray(img_2D_array, dtype=complex)
         h, w = complex_img_array.shape[:2]
 
         f = np.zeros((h, w), dtype=complex)
