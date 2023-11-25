@@ -43,9 +43,8 @@ class Fft:
         # Your program should print in the command line the number of non-zeros you are using and 
         # the fraction they represent of the original Fourier coefficients.
 
-        keep_fraction = 0.2
+        keep_fraction = 0.08
         transformed_img = self.fft_dft_2d(self.img)
-        # transformed_img = self.naive_dft_2d(self.img)
         h, w = transformed_img.shape[:2]
 
         # https://scipy-lectures.org/intro/scipy/auto_examples/solutions/plot_fft_image_denoise.html
@@ -59,15 +58,14 @@ class Fft:
         for column in range(int(w * keep_fraction), int(w * (1 - keep_fraction))):
             transformed_img[:, column] = 0
 
-        print("transformed" + str(transformed_img))
         number_of_non_zeros = np.count_nonzero(transformed_img)
 
         # Invert the denoised image
-        # transformed_img = self.fft_dft_2d_inverse(transformed_img).real
-        transformed_img = self.naive_dft_2d_inverse(transformed_img).real
+        transformed_img = self.fft_dft_2d_inverse(transformed_img).real
 
         # Plot the original image and the denoised image
-        _, axs = plt.subplots(1, 2)
+        fig, axs = plt.subplots(1, 2)
+        fig.suptitle('Mode 2 - Denoising')
         axs[0].imshow(self.img, cmap='gray')
         axs[0].set_title('Original Image')
         axs[1].imshow(transformed_img.real, cmap='gray')
@@ -80,6 +78,34 @@ class Fft:
     # Mode 3
     def mode_3(self):
         print("mode 3")
+        compression_levels = [0, 20, 45, 55, 75, 98] # in percentage
+
+        fig, axs = plt.subplots(2, 3)
+        fig.suptitle('Mode 3 - Compression')
+        compression_level_index = 0
+        for i in range(2):
+            for j in range(3):
+                compression_level = compression_levels[compression_level_index]
+                number_of_non_zeros, compressed_image = self.compress_image_by_level(compression_level)
+                print(f"Number of non-zeros for {compression_level}% compression: {number_of_non_zeros} out of {compressed_image.size}")
+                axs[i, j].set_title(f"Compression level: {compression_level}%")
+                axs[i, j].imshow(compressed_image.real, cmap='gray')
+                compression_level_index += 1
+        plt.show()
+
+    def compress_image_by_level(self, compression_level):
+        percent_of_img_to_keep = 100 - compression_level
+        transformed_img = self.fft_dft_2d(self.img)
+
+        high_frequencies = np.percentile(transformed_img.real, 100 - (percent_of_img_to_keep // 2))
+        lower_frequencies = np.percentile(transformed_img.real, percent_of_img_to_keep // 2)
+
+        transformed_img = transformed_img * np.logical_or(transformed_img >= high_frequencies, transformed_img <= lower_frequencies)
+
+        number_of_non_zeros = np.count_nonzero(transformed_img)
+        transformed_img = self.fft_dft_2d_inverse(transformed_img)
+
+        return number_of_non_zeros, transformed_img
 
     # Mode 4
     def mode_4(self):
