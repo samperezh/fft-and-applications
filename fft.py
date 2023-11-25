@@ -128,7 +128,7 @@ class Dft:
         fft_average_runtime = []
         fft_standard_deviations = []
 
-        # gather data fro the plot by re-running the experiment at least 10 times to obtain 
+        # gather data from the plot by re-running the experiment at least 10 times to obtain 
         # an average runtime for each problem size and a standard deviation
         for i in range(len(list_of_arrays)):
             # naive implementation
@@ -206,7 +206,7 @@ class Dft:
         # assign complex values to array
         N = len(img_1D_array)
         X = np.zeros(N, dtype=complex)
-        for k in range(N): # RENAME VAR TO MATCH FORMULA
+        for k in range(N):
             for n in range(N):
                 X[k] += img_1D_array[n] * np.exp((-2j * np.pi * k * n) / N)
 
