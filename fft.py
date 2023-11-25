@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 import cv2 as cv
+import time
 
 class Fft:
     parser = argparse.ArgumentParser()
@@ -108,8 +109,89 @@ class Fft:
         return number_of_non_zeros, transformed_img
 
     # Mode 4
+    # Produce plots that summarize the runtime of the naive and FFT algorithms
     def mode_4(self):
-        print("mode 4")
+        print("=========================")
+        print("***** Plotting Mode *****")
+        print("=========================")
+        # Create 2D arrays of random elements of various sizes (must be square and sizes must be powers of 2)
+        # np.random.random ((N, N)) creates a 2D array of size NxN with random elements
+        two_exp_5_arr = np.random.random((2**5,2**5))
+        two_exp_6_arr = np.random.random((2**6,2**6))
+        two_exp_7_arr = np.random.random((2**7,2**7))
+        two_exp_8_arr = np.random.random((2**8,2**8))
+        # not using 2^9x2^9 and 2^10x2^10 2D arrays as they take too long to run
+        two_exp_9_arr = np.random.random((2**9,2**9))
+        two_exp_10_arr = np.random.random((2**10,2**10))
+
+        list_of_sizes = ["2^5 x 2^5", "2^6 x 2^6", "2^7 x 2^7", "2^8 x 2^8"]#, "2^9 x 2^9", "2^10 x 2^10"]
+        list_of_arrays = [two_exp_5_arr, two_exp_6_arr, two_exp_7_arr, two_exp_8_arr]# two_exp_9_arr, two_exp_10_arr]
+
+        naive_average_runtime = []
+        naive_standard_deviations = []
+
+        fft_average_runtime = []
+        fft_standard_deviations = []
+
+        # gather data fro the plot by re-running the experiment at least 10 times to obtain 
+        # an average runtime for each problem size and a standard deviation
+        for i in range(len(list_of_arrays)):
+            # naive implementation
+            runtime = []
+            for j in range(10):
+                start = time.time()
+                self.naive_dft_2d(list_of_arrays[i])
+                runtime.append(time.time() - start) # in seconds
+
+            naive_average_runtime.append(np.mean(runtime))
+            naive_standard_deviations.append(np.std(runtime))
+
+            # fft implementation
+            runtime = []
+            for j in range(10):
+                start = time.time()
+                self.fft_dft_2d(list_of_arrays[i])
+                runtime.append(time.time() - start) # in seconds
+
+            fft_average_runtime.append(np.mean(runtime))
+            fft_standard_deviations.append(np.std(runtime))
+
+            # print in the command line the means and variances of the runtime of your algorithms vs the problem size
+            print("*** Problem Size: "+ list_of_sizes[i] + " ***")
+            print ("### Naive Implementation ###")
+            print("Naive Average Runtime: " + str(naive_average_runtime[i]))
+            print("Naive Standard Deviation: " + str(naive_standard_deviations[i]))
+            print ("### FFT Implementation ###")
+            print("FFT Average Runtime: " + str(fft_average_runtime[i]))
+            print("FFT Standard Deviation: " + str(fft_standard_deviations[i]))
+            print("=========================")
+
+        # Plot:
+        # problem size on x-axis & runtime in seconds on the y axis
+        # two lines: one for the naive method and one for the FFT method
+        # include error bars proportional to the standard deviation of the runtime 
+        # representing confidence interval 
+        # (97% confidence interval by making error bar length be twice the standard deviation)
+        naive_error_bar_length = [i * 2 for i in naive_standard_deviations]
+        fft_error_bar_length = [i * 2 for i in fft_standard_deviations]
+
+        print(naive_error_bar_length)
+        print(fft_error_bar_length)
+        
+        plt.title("Runtime of Naive and FFT Algorithms")
+        plt.xlabel("Problem Size")
+        plt.ylabel("Runtime (seconds)")
+
+        # yerr adds error on y axis (algorithms runtime)
+        # capsize: length of the error bar caps in points (default 0.0)
+        # ecolor: colour of the error bars (default same as line)
+        plt.errorbar(list_of_sizes, naive_average_runtime, yerr=naive_error_bar_length, capsize = 4, ecolor="lime",label="naive")
+        plt.errorbar(list_of_sizes, fft_average_runtime, yerr=fft_error_bar_length, capsize = 4, ecolor="red", label="FFT")
+        
+        plt.legend()
+        plt.show()
+        
+
 
     def convert_image_into_array(self):
         self.img = cv.imread(self.args.i, cv.IMREAD_GRAYSCALE)
@@ -223,7 +305,7 @@ class Fft:
         # converting the original image into a NumPy array, we resize it so that it is.
         N = len(img_1D_array)
         # TODO to CHOOSE
-        if N <= 2: # stop splitting the problem and use naive method instead
+        if N <= 64: # stop splitting the problem and use naive method instead
             # We chose to stop splitting the problems at 64
             # We just want the runtime of your FFT to be in the same order of magnitude as what is theoretically expected 
             return self.naive_dft_1d(img_1D_array)
@@ -244,7 +326,7 @@ class Fft:
         # converting the original image into a NumPy array, we resize it so that it is.
         N = len(img_1D_array)
         # TODO to CHOOSE
-        if N <= 2:
+        if N <= 64:
             return self.naive_dft_1d_inverse(img_1D_array)
         else:
             # Split the sum in the even and odd indices which we sum separately and then put together
