@@ -128,7 +128,7 @@ class Dft:
         fft_average_runtime = []
         fft_standard_deviations = []
 
-        # gather data from the plot by re-running the experiment at least 10 times to obtain 
+        # gather data for the plot by re-running the experiment at least 10 times to obtain 
         # an average runtime for each problem size and a standard deviation
         for i in range(len(list_of_arrays)):
             # naive implementation
