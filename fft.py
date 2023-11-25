@@ -5,7 +5,7 @@ from matplotlib.colors import LogNorm
 import cv2 as cv
 import time
 
-class Fft:
+class Dft:
     parser = argparse.ArgumentParser()
     parser.add_argument('-m', type=int, default=1, required=False)
     parser.add_argument('-i', type=str, default="moonlanding.png", required=False)
@@ -16,11 +16,11 @@ class Fft:
 
     # Mode 1
     def mode_1(self):
-        print("mode 1")
         # simply perform the FFT and  
         transformed_img = self.fft_dft_2d(self.img)
         # Output a one by two subplot of the original image and next to it its Fourier transform.
-        _, axs = plt.subplots(1, 2)
+        fig, axs = plt.subplots(1, 2)
+        fig.suptitle('Mode 1 - FFT')
         axs[0].imshow(self.img, cmap='gray')
         axs[0].set_title('Original Image')
         # np.abs(transformed_img) calculates the magnitude of the Fourier transform
@@ -31,7 +31,6 @@ class Fft:
 
     # Mode 2
     def mode_2(self):
-        print("mode 2")
         # output a one by two subplot:
         # include the original image next to its denoised version. 
 
@@ -49,9 +48,6 @@ class Fft:
         h, w = transformed_img.shape[:2]
 
         # https://scipy-lectures.org/intro/scipy/auto_examples/solutions/plot_fft_image_denoise.html
-
-        # transformed_img[int(h * keep_fraction) : int(h*(1-keep_fraction))] = 0
-        # transformed_img[:, int(w*keep_fraction) : int(w * (1-keep_fraction))] = 0
 
         for row in range(int(h * keep_fraction), int(h * (1 - keep_fraction))):
             transformed_img[row, :] = 0
@@ -78,7 +74,6 @@ class Fft:
 
     # Mode 3
     def mode_3(self):
-        print("mode 3")
         compression_levels = [0, 20, 45, 55, 75, 98] # in percentage
 
         fig, axs = plt.subplots(2, 3)
@@ -195,30 +190,6 @@ class Fft:
 
     def convert_image_into_array(self):
         self.img = cv.imread(self.args.i, cv.IMREAD_GRAYSCALE)
-        # self.img = np.array([
-        #     [10, 20, 30],
-        #     [40, 50, -60],
-        #     [70, 80, 90]
-        # ])
-
-        # self.img = np.array([
-        #     [5, 4, 6, 3, 7, 8, 10, 24],
-        #     [-1, -3, -4, -7, 0, -1, 2, 4]
-        # ])
-
-        # self.img = np.array([
-        #     [1, 2, 3, 4, 5, 6, 7, 8],
-        #     [6, 7, 8, 9, 10, 11, 12, 13],
-        #     [11, 12, 13, 14, 15, 16, 17, 18],
-        #     [11, 12, 13, 14, 15, 16, 17, 18]
-        # ])
-
-        # self.img = np.array([
-        #     [1, 2, 3, 4, 5, 6, 7],
-        #     [6, 7, 8, 9, 10, 11, 12],
-        #     [11, 12, 13, 14, 15, 16, 17],
-        #     [11, 12, 13, 14, 15, 16, 17]
-        # ])
 
         # If the image given doesn't have a length or width that is a power of 2 
         # resize it with cv2 otherwise the FFT algorithm might not work
@@ -229,22 +200,6 @@ class Fft:
             w = int(2 ** np.ceil(np.log2(w)))
             h = int(2 ** np.ceil(np.log2(h)))
             self.img = cv.resize(self.img, (w,h))
-
-        # For testing purposes:
-
-        # temp = [1, 2, 3, 4, 5, 6, 7, 8]
-        # X = self.fft_dft_1d_inverse(temp)
-        # print(str(X))
-        # print("fft")
-        # gfg = np.fft.ifft(temp) 
-        # #gfg = np.fft.fft(temp) 
-        # print(gfg)
-
-        # temp = [[5, 4, 6, 3, 7, 8, 10, 24], [-1, -3, -4, -7, 0, -1, 2, 4]]
-        # self.fft_dft_2d_inverse(temp)
-
-        # cv.imshow("Display window", img)
-        # K = cv.waitKey(0) # Wait for a keystroke in the window
 
     # Naive
     def naive_dft_1d(self, img_1D_array):
@@ -277,11 +232,6 @@ class Fft:
 
         for column in range(w):
             F[:, column] = self.naive_dft_1d(F[:,column])
-
-        # print(str(F))
-        # print("fft2")
-        # gfg = np.fft.fft2(img_2D_array) 
-        # print(gfg)
         return F
     
     def naive_dft_2d_inverse(self, img_2D_array):
@@ -304,7 +254,6 @@ class Fft:
         # we can assume that the size of img_1D_array is a power of 2 as when 
         # converting the original image into a NumPy array, we resize it so that it is.
         N = len(img_1D_array)
-        # TODO to CHOOSE
         if N <= 64: # stop splitting the problem and use naive method instead
             # We chose to stop splitting the problems at 64
             # We just want the runtime of your FFT to be in the same order of magnitude as what is theoretically expected 
@@ -325,7 +274,6 @@ class Fft:
         # we can assume that the size of img_1D_array is a power of 2 as when 
         # converting the original image into a NumPy array, we resize it so that it is.
         N = len(img_1D_array)
-        # TODO to CHOOSE
         if N <= 64:
             return self.naive_dft_1d_inverse(img_1D_array)
         else:
@@ -352,11 +300,6 @@ class Fft:
 
         for column in range(w):
             F[:, column] = self.fft_dft_1d_inverse(F[:,column])
-
-        # print(str(F))
-        # print("fft2")
-        # gfg = np.fft.ifft2(img_2D_array) 
-        # print(gfg)
         return F   
     
     def fft_dft_2d(self, img_2D_array):
@@ -370,28 +313,23 @@ class Fft:
 
         for column in range(w):
             F[:, column] = self.fft_dft_1d(F[:,column])
-
-        # print(str(F))
-        # print("fft2")
-        # gfg = np.fft.fft2(img_2D_array) 
-        # print(gfg)
         return F 
 
 
 if __name__ == "__main__":
     # program starts running here
-    fft = Fft()
+    dft = Dft()
 
     # convert image into a NumPy array
-    fft.convert_image_into_array()
+    dft.convert_image_into_array()
 
-    if(fft.args.m == 1):
-        fft.mode_1()
-    elif(fft.args.m == 2):
-        fft.mode_2()
-    elif(fft.args.m == 3):
-        fft.mode_3()
-    elif(fft.args.m == 4):
-        fft.mode_4()
+    if(dft.args.m == 1):
+        dft.mode_1()
+    elif(dft.args.m == 2):
+        dft.mode_2()
+    elif(dft.args.m == 3):
+        dft.mode_3()
+    elif(dft.args.m == 4):
+        dft.mode_4()
 
 
