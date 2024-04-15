@@ -1,7 +1,6 @@
-# ECSE 316 Assignment 2: Fast Fourier Transform and Applications
-## November 24th, 2023
+## Fast Fourier Transform and Applications
 
-Note that this code was written and tested on macOS 13.2.1 (M1 chip) through VSCode terminal. 
+Implementing two versions of the Discrete Fourier Transform (DFT). The first version will be a brute force approach that follows directly from the formula. The second one will be an implementation of the Fast Fourier Transform (FFT) which follows a divide-and-conquer approach to algorithm design. In fact, this approach will focus on the Cooley-Tukey FFT. We will then make use of our FFT implementation for different applications such as denoising an image and compressing an image file.
 
 The FFT application should be invoked at the command line using the following syntax: 
 
@@ -24,3 +23,5 @@ Libraries used:
 - matplotlib.colors
 - cv2
 - time
+
+Note that this code was written and tested on macOS 13.2.1 (M1 chip) through Visual Studio Code terminal. 
